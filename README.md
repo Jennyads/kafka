@@ -1,3 +1,49 @@
+
+<h2>Kafka</h2>
+Este é um sistema open source altamente distribuído, conhecido como Apache Kafka, que opera com fluxo contínuo de dados. Sua importância reside na capacidade de lidar com eventos em sistemas, auxiliando na geração de dados históricos que podem ser monitorados posteriormente. O Kafka coleta todos os eventos, armazena, manipula e preserva essas informações para fins específicos. Ele é altamente escalável e possui baixa latência, além de oferecer uma notável tolerância a falhas.
+
+Arquitetura:
+O Kafka opera em um ambiente de cluster distribuído, no qual diversas máquinas, chamadas "brokers", trabalham juntas para gerenciar a troca de dados. O Zookeeper é um componente-chave que atua como sistema de descoberta de serviços, coordenando os brokers em execução. Ele gerencia erros, recuperações e permissões. Adicionar um novo broker é uma tarefa que o Zookeeper realiza com eficiência, garantindo a integridade do cluster Kafka.
+
+Tópicos e Partições:
+Os dados no Kafka são organizados em tópicos, que podem ser considerados como canais que direcionam as informações para serem armazenadas. Os consumidores leem esses tópicos, e as mensagens são enfileiradas em partições. A separação dos tópicos em várias partições, também chamadas de "segmentos", acelera o processo de leitura e permite escalabilidade. Não é necessário que as partições de um tópico residam no mesmo broker.
+
+Registro (Record):
+Cada registro de dados no Kafka possui uma estrutura de mensagem que consiste em cabeçalhos (metadados opcionais), uma chave (que ajuda a manter o contexto da mensagem) e um valor (o conteúdo da mensagem). O valor pode estar em diferentes formatos, como texto, JSON ou protobuf. Além disso, cada registro possui um carimbo de data e hora (timestamp) que indica quando foi gerado.
+
+Tópico Compactado:
+Os tópicos compactados no Kafka mantêm uma versão compacta do log, o que ajuda a reduzir o armazenamento e otimiza a leitura de dados.
+
+Distribuição de Partições e Fatores de Replicação:
+As partições podem ser distribuídas independentemente dos tópicos, o que significa que diferentes partições podem residir em diferentes brokers. O fator de replicação determina quantas cópias de uma partição são mantidas em vários brokers. Isso garante a redundância e a disponibilidade dos dados. O valor do fator de replicação é determinado com base na importância do dado para o negócio.
+
+Entrega de Mensagens:
+O Kafka usa um algoritmo de round-robin para distribuir as mensagens nas partições por padrão, o que não garante a ordem das mensagens. Para garantir a ordem, é importante direcionar mensagens com a mesma chave para a mesma partição.
+
+Partições Líderes e Seguidoras:
+Cada partição tem um líder e seguidoras. Quando um consumidor lê uma mensagem, ele a lê da partição líder. Se o líder falhar, o Kafka seleciona uma das seguidoras como a nova líder.
+
+Produtores:
+Os produtores criam mensagens com um tópico, chave e valor. As mensagens são serializadas, enviadas para uma partição e broker específico. Os produtores podem especificar diferentes níveis de confirmação (ACK) para garantir a entrega das mensagens.
+
+Formatos de Garantia de Entrega:
+
+At Most Once: Pode perder algumas mensagens.
+At Least Once: Garante que as mensagens sejam entregues pelo menos uma vez, mas algumas podem chegar duplicadas.
+Exactly Once: Garante que cada mensagem seja entregue exatamente uma vez.
+Indepotente Off: Armazena mensagens duplicadas em caso de falhas de conexão.
+Indepotente On: Identifica e descarta mensagens duplicadas.
+Consumidores:
+Os consumidores são responsáveis por ler as mensagens. Eles podem ser programados para ler todas as partições e podem ser organizados em grupos para facilitar a leitura e garantir alta disponibilidade.
+
+Segurança:
+O Kafka suporta criptografia de mensagens durante a transmissão e permite a autenticação e autorização para proteger o acesso aos dados.
+
+Kafka Connect e Kafka REST Proxy:
+O Kafka Connect é uma ferramenta que permite a integração de dados de várias fontes em tópicos do Kafka. O Kafka REST Proxy fornece uma interface HTTP para interagir com o Kafka, simplificando a comunicação com o sistema sem a necessidade de drivers específicos. Ambos são úteis para a integração de dados em um ambiente Kafka.
+
+
+<h3>Anotações</h3>
 É um sistema open source que trabalha de forma distribuida.
 Trabalha com streaming de dados. 
 Porque é necessário? Quase todos os sistemas são orientados a eventos, assim ajuda a gerar dados históricos para serem monitorados.
