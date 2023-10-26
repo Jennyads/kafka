@@ -66,4 +66,6 @@ Diversos conectores que conseguem pegar dados por exemplo do twitter, mysql e co
 é como se fosse um cluster(várias máquinas workers) que joga no kafka.
 Depois de jogar no kafka, ainda dá para jogar em outro local externo.
 
-
+Kafka REST Proxy:
+App -> HTTP -> REST Proxy -> Kafka
+Para que não precisa se conectar ao kafka por um driver padrão. Só faz uma requisição HTTP e joga os dados no kafka por uma API.
