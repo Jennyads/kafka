@@ -44,5 +44,26 @@ Formatos:
 
 
 - Indepotente off: manda/guarda mensagem duplicada em caso de falha de conexão/erro
--Indepotente on: consegue identificar mensagem duplicada e exclui (descarta mensagens iguais)
+- Indepotente on: consegue identificar mensagem duplicada e exclui (descarta mensagens iguais)
+
+
+
+Consumers:
+Responsáveis por ler as mensagens, pode ser um programa/software qualquer desenvolvido para isso. O consumer lê todas as partições. 
+Pode ter grupos de consumidores para facilitar a leitura das partições e deixar mais rápido. Nesses grupos, o kafka vai fazer a distribuição entre eles. 
+Um consumer por partição, o bom é ter a mesma quantidade de partição para cada consumer. 
+
+Quando o consumer para de responder, o kafka faz um rebalanceamento, fazendo os apontamentos. Toda vez que muda o número de consumers, o kafka faz o rebalanceamento.
+
+Segurança:
+é possivel trabalhar com criptozação de mensagens no processo de transmissão.
+Quando é gravada no broker, não fica criptografada.
+Pode trabalhar com autorização ou autenticação.
+
+Kafka connect:
+Forma de pegar informações de um lugar e jogar em outro lugar.
+Diversos conectores que conseguem pegar dados por exemplo do twitter, mysql e coloca nos topicos.
+é como se fosse um cluster(várias máquinas workers) que joga no kafka.
+Depois de jogar no kafka, ainda dá para jogar em outro local externo.
+
 
