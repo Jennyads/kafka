@@ -21,7 +21,28 @@ Distrubuição de partições:
 topic: sale
 topic: clients 
 
-intedependete dos topic, as partições deles podem estar no mesmo broker, por exemplo: partição 1 da sala com a partição 3 do client no BROKER A
+intedependete dos topic, as partições deles podem estar no mesmo broker, por exemplo: partição 1 da sale com a partição 3 do client no BROKER A
 
 Replication factor: pelo menos x cópia em outros brokers. Sempre vai ter a replica em diferentes brokers, o valor de replica pode ser determinado conforme o usuário quiser (criticidade do negocio). Assim garante que o sistema funcione corretamente e de forma infinita. 
 Resumindo: quando crio um topic, determino a quantidade partições e replicações vai fazer. 
+
+Delivery: por padrão o kafka não gera uma regra principal para entregar as mensagens em cada partição, usa algoritmo de rond robin para fazer essas distribuições. 
+
+Não consegue garantir a ordem das partições, assim parte do principal qaue as mensagens vão estar desordenadas. Para pegar de forma ordenada, pega o mesmo "aqui", que tem a chave por exemplo vendas, que vai para a mesma partição. 
+
+Partição líder: das replicações, uma é lider e as outras são seguidoras, toda vez que alguém consumir a mensagem, vai ser referente a do líder. Só se o líder cair, vai para o próximo. 
+
+Producer: a mensagem é criada com topic, chave e valor. Ao enviar, a mensagem vai ser serializada (formato determminado), mandada para partição e broker. 
+Ack 0: não vai avisar/dar retorno se a a mensagem foi gravada no broker (assim torna o processo mais rápido)
+Ack 1: dá o retorno se a mensagem foi lida e gravada pelo líder (garantia de entrega).
+Ack -1 ALL: dá o retorno que a mensagem foi lida e gravada no broker lider e nos seus seguidores, só retorna quando for gravado em todos (mais demorado)
+
+Formatos: 
+- at most once: pode perder algumas mensagens
+- at least once: garante que as mensagens sejam entregues pelo menos uma vez, algumas podem chegar duplicadas (necessário tratar o programa para remover mensagens duplicadas)
+- exacly onde: garante que mande 1 vez
+
+
+- Indepotente off: manda/guarda mensagem duplicada em caso de falha de conexão/erro
+-Indepotente on: consegue identificar mensagem duplicada e exclui (descarta mensagens iguais)
+
