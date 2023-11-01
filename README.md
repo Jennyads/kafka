@@ -1,3 +1,108 @@
+<h2>Anotações do curso: "Domine Apache Kafka, Fundamentos e Aplicações Reais"</h2>
+Dados: processsamos dados que são capazes de produzir informação e conhecimentos;
+Dimensões do valor do dado: tempo (identificar fraude), relação (vendas do dia, semana, ano), valor, volume, variedade.
+Apache Kafka: plataforma de streaming para pipelines de dados de alto desempenhos, análise de streaming, integração de dados e aplicações de missão crítica.
+
+Exemplo: 
+- Ouvinte de música (consumidor)
+- Produtor de música (produtores)
+
+
+Produtores querem publicar músicas e consumidores querem consumir 
+Assim produtores publicam musicas pelo serviços de streaming e consequentemente o consumidor encontra essa música pelo serviço de streaming. Ambos concentram a música em um mesmo lugar. 
+
+Exemplo:
+folha de pagamento que envia dados para mais de um sistema (contabilidade, auditoria, finanças, DW, RH) - Problema de mesma informação compartilhada
+E-commerce que lança centenas de logs, assim pode ter problema com registro no banco, erro no banco e perca dos logs. Problema: diferentes ritmos (lança uma promoção), indisponibilidade, perda de dados ou reprocessamento
+Problemas: mesma informação compartilhada, sobrecarga (diferentes ritmos), indisponibilidade, perda de dados ou reprocessamento. 
+
+Publiser - produzem dados para os kafka
+Subscribers - consomem o que interessa (assina)
+- Podem trabalhar em diferentes ritmos, consumidores podem ler dados mais de uma vez, alta disponibilidade e capacidade com recursos de cluster e particionamento.
+
+Cluster:
+Exemplo: uma aplicação que processa dados, assim a empresa aumenta e consequentemente a capacidade de processamento deve aumentar.
+Solução de escalar verticalmente: faria como um upgrade para aumentar a demanda (aumentar capacidade de equipamento), para isso precisa parar a aplicação e requer configurações complexas, além de incompatibilidade.
+
+Escalamento horizontal: adicionar mais equipamentos (novos lotes, redes de computadores para processar dados) que fazem parte desse novo cluster de processamento. Não requer parar o sistema para aumentar a capacidade, configurações mais simples, menos problemas com incompatibilidade, "hardware commodity", alta disponibilidade: tolerência a falhas. Rede de computadores com o mesmo objetivo - CLUSTER. 
+
+Caso de aplicação de varejo com muitas divisões, pode fazer cópias do banco. Assim poderia dividir os dados por regiões do Brasil, por exemplo. 
+Particionamento: dividir os dados fisicamente, possui parte dos dados, a aplicação consulta a partição que tem os dados de interesse. 
+
+Replicações: pega as partições e replica em diferentes servidores. Sistema com uma probabilidade de falha é muito menor nas busca por dados.  
+
+
+Em Apache Kafka, um broker é um servidor que armazena e processa dados. Um cluster é um grupo de brokers que trabalham juntos para fornecer um serviço de mensagens confiável e escalar.
+
+Aqui está uma tabela que resume as principais diferenças entre broker e cluster:
+
+Característica |	Broker |	Cluster
+Definição |	Um servidor que armazena e processa dados |	Um grupo de brokers que trabalham juntos
+Componentes |	Um broker é um servidor individual |	Um cluster é composto por vários brokers
+Funções   |	Armazena e processa dados  |	Fornece um serviço de mensagens confiável e escalável
+
+
+Um broker é um servidor que armazena e processa dados em Kafka. Cada broker é identificado por um ID exclusivo. Os brokers são responsáveis por armazenar os dados de tópicos, que são coleções de mensagens.
+
+Os brokers podem ser configurados para replicar os dados de tópicos em vários brokers. Isso ajuda a garantir que os dados estejam disponíveis mesmo se um broker falhar.
+
+Clusters
+
+Um cluster é um grupo de brokers que trabalham juntos para fornecer um serviço de mensagens confiável e escalável. Os clusters são compostos por vários brokers, cada um com um ID exclusivo.
+
+Os clusters são usados para aumentar a capacidade de processamento e armazenamento de Kafka. Eles também podem ser usados para melhorar a disponibilidade de dados.
+
+Exemplos
+
+Um exemplo de um broker é um servidor que armazena dados de um tópico de log. Um exemplo de um cluster é um grupo de brokers que armazenam dados de vários tópicos.
+
+Conclusão
+
+Brokers e clusters são conceitos importantes em Apache Kafka. Os brokers são os componentes básicos de Kafka, enquanto os clusters são usados para aumentar a capacidade e a disponibilidade de Kafka.
+
+Kafka broker: serviço/servidor que o kafka recebe (intermediário), cada nó do cluster pode rodar uma ou mais intâncias de brokers. 
+- Pode ter mais de um serviço em um mesmo servidor 
+- Atribui numeração sequencial (offset) as mensagens 
+- Salva em disco (não precisa ser consumido em tempo real, permite recuperar em falhas)
+- Ckuster controller: "chefe" escolhido aleatoriamente
+
+
+Bootstrap: aplicação que serve de porta de entrada para outros servidores.
+
+- Não precisa conhecer a estrutura do cluster (faz conexão com apenas um broker)
+- Brokers sabem a estrutura e informam ao cliente;
+- Pode-se então conectar-se a um broker específico;
+- Conexão a um broker é uma conexão ao cluster
+
+
+- Um broker por ter "n" topics
+- Um topic pode ter "n" partições
+- Podem haver brokers que não tenham partições de determinados topics;
+
+- Controler: é o primeiro broker a entrar no cluster, se ele cai, outros tentar ser, mas só um é eleito. Controller: controla a lista de brokers disponíveis no cluster.
+
+As principais partições são chamadas de leaders, as copias são chamadas de followers e dependem do fator de replicação.
+Followers apenas se mantem atualizados com o leaders. 
+
+ISR - mostra quais partições (followers) que estão sincronizados com os leaders e são candidatas a ser leaders.  Necessário definir um mínimo de replicas na lista.
+
+São distribuidas por um balanceamento, copias devem ficar em máquinas diferentes (tolerância a falhas), racks são considerados, pois o rack inteiro pode falhar. 
+
+O broker pode ser leader ou follower de determinadas partições.
+- A partição leader é responsável por todas as requisições de producers e consumers.
+- O producer recebe uma lista de leaders e decide para para qual partição quer mandar os dados.
+- O producer manda para o broker da partição leader.
+- O broker persiste a mensagem e retorna uma confirmação (acknowledgment)
+- O consumr também lê a mensagem da partição leader.
+
+Segments: dados ficam em arquivos fisícos: diretórios nomeados de "logs".
+- Arquivo de partições são divididos em arquivos menores chamados de segmentos. Os dados vão para o primeiro segmento, até o limite, então ele inicia um novo arquivo.
+
+
+Offset:  um offset é um número que representa a posição de um determinado registro em um tópico. Os offsets são usados para rastrear o progresso de um consumidor de grupo à medida que consome mensagens de um tópico.Cada partição de um tópico Kafka tem seu próprio conjunto de offsets, que indicam o último registro que foi processado com sucesso pelo consumidor de grupo para aquela partição. Permite manter o estado, reiniciar e identificar mensagem de forma única.
+Offset não reinicia em um novo segmento. O número do arquivo do segmento possui o número do primeiro offset do segmento. Offset não é único no tópico, e sim na partição. 
+
+
 
 <h2>Kafka</h2>
 Este é um sistema open source altamente distribuído, conhecido como Apache Kafka, que opera com fluxo contínuo de dados. Sua importância reside na capacidade de lidar com eventos em sistemas, auxiliando na geração de dados históricos que podem ser monitorados posteriormente. O Kafka coleta todos os eventos, armazena, manipula e preserva essas informações para fins específicos. Ele é altamente escalável e possui baixa latência, além de oferecer uma notável tolerância a falhas.
