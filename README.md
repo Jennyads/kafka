@@ -1,4 +1,173 @@
 <h2>Anotações do curso: "Domine Apache Kafka, Fundamentos e Aplicações Reais"</h2>
+
+````
+#instalar Java
+sudo apt install curl mlocate default-jdk -y
+#verificar versão
+java -version
+
+#descompactar
+tar -xzf kafka_2.13-2.8.0.tgz
+
+#iniciar zookeeper
+./zookeeper-server-start.sh ../config/zookeeper.properties
+
+#iniciar broker
+./kafka-server-start.sh ../config/server.properties
+
+#criar topico
+./bin/kafka-topics.sh --create --topic ola-mundo --bootstrap-server localhost:9092
+
+#enviar mensagem producer
+./kafka-console-producer.sh --topic ola-mundo --bootstrap-server localhost:9092
+
+#consumir
+bin/kafka-console-consumer.sh --topic ola-mundo --from-beginning --bootstrap-server localhost:9092
+
+#listar
+./kafka-topics.sh --zookeeper localhost:2181 --list
+
+#descrever
+./kafka-topics.sh --describe --topic ola-mundo --bootstrap-server localhost:9092
+
+
+offset -numeração dada as mensagens por ordem de chegada (independente por partição)
+criar consumidores que vai ler de determinada partição e offset (partições diferentes de um mesmo offset):
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --partition 0 --offset 2
+
+TOPICS:
+#lista os topicos existentes
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list 
+
+#criamos um novo tópico com 3 particoes e 1 fator de replicação
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic novotopico --create --partitions 3 --replication-factor 1
+
+#lista os topicos existentes
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list 
+
+#descreve
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic novotopico --describe
+
+#alterar partições
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic novotopico --alter --partitions 4
+
+#exclusão
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic novotopico --delete
+
+PRODUCER:
+#criamos tópico
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --create --partitions 3 --replication-factor 1
+
+#console producer
+./kafka-console-producer.sh --bootstrap-server 127.0.0.1:9092  --topic mensagens
+
+# enviar mensagem para topico não existente
+./kafka-console-producer.sh --bootstrap-server 127.0.0.1:9092  --topic novasmensagens
+
+#listamos os topicos para confirmar a criação
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list 
+
+CONSUMER:
+#Consumir do inicio
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --from-beginning
+
+#Producer
+./kafka-console-producer.sh --bootstrap-server 127.0.0.1:9092  --topic mensagens
+
+#consumir com off set
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 0 --offset 2
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 1 --offset 2
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 2 --offset 2
+
+#max messagens 
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 2 --offset 2 --max-messagens 1
+
+#consumir de partições
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 0
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 1
+./kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic mensagens --partions 2
+
+OFFSET:
+Em Apache Kafka, o termo "offset" refere-se a um identificador único associado a cada mensagem em um tópico específico. Este identificador é atribuído a uma mensagem quando ela é publicada no tópico e é usado para rastrear o progresso do consumo de mensagens por parte dos consumidores.
+Conjunto de Offsets na Partição:
+
+Cada partição em um tópico possui seu próprio conjunto independente de offsets. Ou seja, para uma partição específica, os offsets são atribuídos de forma única e contínua para as mensagens nessa partição. O offset é específico para uma partição e não é compartilhado entre partições.
+Conjunto de Mensagens em um Tópico:
+
+Um tópico pode ter várias partições, e cada partição terá seu próprio conjunto de offsets e mensagens. Portanto, dentro de um tópico, as mensagens estão organizadas em partições e cada partição tem seu próprio conjunto de offsets.
+Resumindo, cada partição em um tópico tem seu próprio conjunto exclusivo de offsets e mensagens. Quando você lê ou grava em um tópico, você está trabalhando com partições específicas e seus respectivos offsets. Os offsets em diferentes partições não estão relacionados entre si; eles são independentes e mantêm a ordem dentro daquela partição específica.
+
+GRUPO DE CONSUMIDORES:
+Em conjunto vão processar as mensagens, é uma forma de escalar o processamento de mensagens.
+
+#Cria um consumidor com um grupo
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --group consumidores
+
+#Cria outro consumidor com o mesmo grupo
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --group consumidores
+
+#Cria um consumidor do mesmo topico mas de outro grupo
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --group novosconsumidores
+
+#mostra consumers groups
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+ 
+#descrever grupos
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group consumidores
+
+#abrir um novo consumidor usando from beggining
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --group consumidores --from-beginning
+
+#reset do offset
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group consumidores --topic mensagens --reset-offsets --to-earliest --execute 
+
+#novo consumidor para o grupo, as mensagens devem ser lidas desde o inicio
+./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic mensagens --group consumidores
+
+
+REPLICAS:
+#chegar no zookeeper
+./zookeeper-shell.sh localhost:2181
+ls /brokers/ids
+
+#criamos um topico onde definimos que numero minimo de replicas deve ser igual a 3
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic testall --create --partitions 3 --replication-factor 3
+--config min.insync.replicas=3
+
+#abrimos um producer com acks = all
+./kafka-console-producer.sh --bootstrap-server 127.0.0.1:9092  --topic testall --request-required-acks all
+
+#chegar no zookeeper
+ls /brokers/ids
+
+#inicar broker de id 2
+./kafka-server-start.sh ../config/server.properties2
+
+#chegar no zookeeper
+ls /brokers/ids
+
+COMPRESSÃO:
+reduz o trafego de dados.
+Batchs: agrupa um conjunto mensagens, aumenta a taxa de compressão. Não perde a caracteristica de mensagem e não afeta a velocidade.
+#cria topico com compactação
+./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic compress --create --partitions 3 --config compression.type=gzip
+
+#cria producer com compactação
+./kafka-console-producer.sh --bootstrap-server 127.0.0.1:9092  --topic compress --compression.codec gzip
+
+API
+- Interagir com um broker no kafka, implementa um cliente (seja produtor ou consumidor). 
+-aplicação que produz mensagens para o topic
+-outra que vai consumir
+-pip: gerenciamente de módulos
+-jupyter: idea baseado em notebooks, desenvolve e implementa atráves de células.
+kafka-python: modulo do python para interagir em altissimo nivel com kafka.
+notebook produtor e consumidor.
+
+
+key = usa o hash para fazer o particionamento 
+
+````
 Dados: processsamos dados que são capazes de produzir informação e conhecimentos;
 Dimensões do valor do dado: tempo (identificar fraude), relação (vendas do dia, semana, ano), valor, volume, variedade.
 Apache Kafka: plataforma de streaming para pipelines de dados de alto desempenhos, análise de streaming, integração de dados e aplicações de missão crítica.
